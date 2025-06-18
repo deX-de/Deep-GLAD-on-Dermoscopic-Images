@@ -1,0 +1,151 @@
+param_grid:
+  unsupervised:
+    dataset:
+      - HAM10000
+    normal_classes: 
+      HAM10000: [5]
+    model_type:
+      - SIGNET 
+      - CVTGAD 
+      - OCGTL
+    segmentation_method:
+      - patch
+      - slico
+    features:
+      - mean_rgb
+      - color
+      - texture
+      - shape
+      - all
+    edges:
+      - knn_spatial 
+      - knn_spatial_color
+      - rag
+    mask: [False, True]
+    virtual_nodes: [False, True]
+    seed: [42]
+    epochs: 20
+    results_file: unsupervised_ham_results.csv
+    summary_file: unsupervised_ham_summary.csv
+    log_file: unsupervised_ham_epochs.log
+
+  semi_supervised:
+    dataset:
+      - HAM10000
+    normal_classes: 
+      HAM10000: [5]
+    model_type:
+      - OCGTL
+    segmentation_method:
+      - patch
+      - slico 
+    features:
+      - mean_rgb
+      - color
+      - texture
+      - shape
+      - all
+    edges:
+      - knn_spatial 
+      - knn_spatial_color
+      - rag
+    mask: [False, True]
+    virtual_nodes: [False, True]
+    seed: [42]
+    epochs: 20
+    results_file: semi_supervised_ham_results.csv
+    summary_file: semi_supervised_ham_summary.csv
+    log_file: semi_supervised_ham_epochs.log
+
+segmentation_config:
+    slico:
+      HAM10000:
+        n_segments: 20
+    patch:
+      HAM10000:
+        patch_size: 112
+
+model_config:
+  CVTGAD:
+    hidden_dim: 16
+    num_gc_layers: 2
+    str_dim: 16
+    dg_dim: 16
+    gnn_layer: GINConv
+    graph_level_pool: global_mean_pool
+  SIGNET:
+    hidden_dim: 16
+    encoder_layers: 2
+    explainer_hidden_dim: 8
+    explainer_layers: 2
+    readout: concat
+    explainer_readout: add
+    explainer_model: gin
+    pooling: add
+  OCGTL:
+    num_trans: 6
+    hidden_dim: 16
+    dim_targets: 16
+    num_layers: 2
+    use_norm: gn
+    pooling: add
+
+dataloader_config:
+  batch_size: 128
+  shuffle_train: true
+  num_workers: 4
+  persistent_workers: false
+  pin_memory: false
+  # For semi-supervised setup
+  semi_supervised:
+    enabled: true
+    labeled_fraction: 0.05 # Fraction of the *training* set to be labeled
+    normal_label: 1
+    anomaly_label: -1
+    unlabeled_label: 0
+
+graph_construction:
+  dataset:
+    name: 'HAM10000_metadata'
+    root: 'data'
+    path: 'data/HAM10000/raw/images'
+    use_mask: true
+    mask_dir: 'data/HAM10000/raw/masks'
+    mask_suffix: '_segmentation'
+    label_source: 'csv'
+    label_file: 'data/HAM10000/raw/HAM10000_metadata.csv'
+    image_column: 'image_id'
+    label_column: 'dx'
+    train_split: 1.0 # Full dataset for experiments with stratified k-fold
+    num_workers: 1
+
+  segmentation:
+    method: slic 
+    params:
+        n_segments: 20
+        compactness: 10
+  features:
+    color:
+      enabled: true
+      color_spaces: ['rgb', 'hsv', 'lab']
+    texture:
+      enabled: true
+    shape:
+      enabled: true
+    virtual_nodes:
+      background: false 
+      global: false 
+
+  edges:
+    rag:
+      enabled: true
+      connectivity: 2 # For RAG (1 for 4-connectivity, 2 for 8-connectivity)
+    knn_spatial:
+      enabled: true
+      k: 6 # Number of neighbors for kNN graph
+    knn_spatial_color:
+      enabled: true 
+      k: 6
+
+  # Primary edge type to use in data.edge_index and data.edge_attr
+  primary_edge_type: knn_spatial # Options: rag, knn_spatial, knn_spatial_color

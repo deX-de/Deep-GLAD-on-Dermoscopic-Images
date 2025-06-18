@@ -1,0 +1,51 @@
+dataset:
+  name: 'HAM10000'
+  root: 'data'
+  path: 'data/HAM10000/raw/images'
+  use_mask: true
+  mask_dir: 'data/HAM10000/raw/masks'
+  mask_suffix: '_segmentation'
+  label_source: 'csv'
+  label_file: 'data/HAM10000/raw/HAM10000_metadata.csv'
+  image_column: 'image_id'
+  label_column: 'dx'
+  train_split: 0.8
+  classes: [0, 1, 2, 3, 4, 5, 6]
+  num_workers: 1
+
+segmentation:
+  method: slico 
+  params:
+      n_segments: 20
+      compactness: 10
+      enforce_connectivity: True
+
+# segmentation:
+#   method: patch 
+#   params:
+#       patch_size: 112 
+
+features:
+  color:
+    enabled: true
+    color_spaces: ['rgb', 'hsv', 'lab']
+  texture:
+    enabled: true
+  shape:
+    enabled: true
+  virtual_nodes:
+    background: true # Add a node representing the background (img[~mask_union]), can lead to errors when the mask is all ones
+    global: true # Add a node representing the whole image
+
+edges:
+  rag:
+    enabled: true
+    connectivity: 2 # For RAG (1 for 4-connectivity, 2 for 8-connectivity)
+  knn_spatial:
+    enabled: true
+    k: 6 # Number of neighbors for kNN graph
+  knn_spatial_color:
+    enabled: true
+    k: 6
+# Primary edge type to use in data.edge_index and data.edge_attr
+primary_edge_type: knn_spatial # Options: rag, knn_spatial, knn_spatial_color

@@ -1,0 +1,6 @@
+-f https://download.pytorch.org/whl/cpu/torch_stable.html
+-f https://pytorch-geometric.com/whl/torch-2.0.1+cu118.html
+torch_scatter
+torch_cluster
+torch-spline-conv
+torch_geometric
