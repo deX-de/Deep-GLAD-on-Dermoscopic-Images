@@ -1,6 +1,6 @@
 # From Pixels to Graphs: Deep Graph-Level Anomaly Detection on Dermoscopic Images
 
-This is the source code for our systematic comparison of image-to-graph transformations and graph-level anomaly detection methods mentioned in our paper "Deep Graph-Level Anomaly Detection on Dermoscopic Images". We implement a graph-based approach to (one vs. rest) anomaly detection on the HAM10000 image datasets using Graph Neural Networks (GNNs). 
+This is the source code for our systematic comparison of image-to-graph transformations and graph-level anomaly detection methods mentioned in our paper ["Deep Graph-Level Anomaly Detection on Dermoscopic Images"](https://arxiv.org/abs/2508.11826). We implement a graph-based approach to (one vs. rest) anomaly detection on the HAM10000 image datasets using Graph Neural Networks (GNNs). 
 The code currently supports and implements the following models: 
 [OCGTL](https://github.com/boschresearch/GraphLevel-AnomalyDetection), [SIGNET](https://github.com/yixinliu233/SIGNET), and [CVTGAD](https://github.com/jindongli-Ai/CVTGAD).
 
